@@ -34,6 +34,12 @@ public abstract class AbstractByteBufAllocator implements ByteBufAllocator {
         ResourceLeakDetector.addExclusions(AbstractByteBufAllocator.class, "toLeakAwareBuffer");
     }
 
+    /**
+     * 装饰器模式，用SimpleLeakAwareByteBuf或AdvancedLeakAwareByteBuf来包装原始的ByteBuf
+     * 两个包装类均通过调用ResourceLeak的record方法来记录ByteBuf的方法调用堆栈，区别在于后者比前者记录更多的内容  
+     * @param buf
+     * @return
+     */
     protected static ByteBuf toLeakAwareBuffer(ByteBuf buf) {
         ResourceLeakTracker<ByteBuf> leak;
         switch (ResourceLeakDetector.getLevel()) {
