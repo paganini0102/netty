@@ -182,14 +182,20 @@ import io.netty.handler.codec.serialization.ObjectDecoder;
  * @see LengthFieldPrepender
  */
 public class LengthFieldBasedFrameDecoder extends ByteToMessageDecoder {
-
+	/** 表示字节流表示的数据是大端还是小端，用于长度域的读取 */
     private final ByteOrder byteOrder;
+    /** 表示的是包的最大长度，超出包的最大长度netty将会做一些特殊处理 */
     private final int maxFrameLength;
+    /** 指的是长度域的偏移量，表示跳过指定长度个字节之后的才是长度域 */
     private final int lengthFieldOffset;
+    /** 记录该帧数据长度的字段本身的长度 */
     private final int lengthFieldLength;
     private final int lengthFieldEndOffset;
+    /** 该字段加长度字段等于数据帧的长度，包体长度调整的大小，长度域的数值表示的长度加上这个修正值表示的就是带header的包 */
     private final int lengthAdjustment;
+    /** 从数据帧中跳过的字节数，表示获取完一个完整的数据包之后，忽略前面的指定的位数个字节，应用解码器拿到的就是不带长度域的数据包 */
     private final int initialBytesToStrip;
+    /** 如果为true，则表示读取到长度域，TA的值的超过maxFrameLength，就抛出一个 TooLongFrameException，而为false表示只有当真正读取完长度域的值表示的字节之后，才会抛出 TooLongFrameException，默认情况下设置为true，建议不要修改，否则可能会造成内存溢出 */
     private final boolean failFast;
     private boolean discardingTooLongFrame;
     private long tooLongFrameLength;
