@@ -729,15 +729,17 @@ public final class NioEventLoop extends SingleThreadEventLoop {
         try {
             int selectCnt = 0;
             long currentTimeNanos = System.nanoTime();
+            // SingleThreadEventExecutor#delayNanos()是最近一个调度任务的到期时间，没有调度任务返回1秒。selectDeadLineNanos指可以进行Selector#select()操作的截止时间点
             long selectDeadLineNanos = currentTimeNanos + delayNanos(currentTimeNanos);
             for (;;) {
+            	// 四舍五入将Selector#select()操作超时时间换算为毫秒单位
                 long timeoutMillis = (selectDeadLineNanos - currentTimeNanos + 500000L) / 1000000L;
-                if (timeoutMillis <= 0) {
-                    if (selectCnt == 0) {
-                        selector.selectNow();
-                        selectCnt = 1;
+                if (timeoutMillis <= 0) { // 超时时间小于等于0，则不再进行其它的Selector#select()操作
+                    if (selectCnt == 0) { // 如果没有进行过Selector#select()操作
+                        selector.selectNow(); // 调用非阻塞的Selector#selectNow()后返回
+                        selectCnt = 1; // 计数器＝1
                     }
-                    break;
+                    break; // 退出for循环
                 }
 
                 // If a task was submitted when wakenUp value was true, the task didn't get a chance to call

@@ -735,7 +735,7 @@ abstract class AbstractChannelHandlerContext extends DefaultAttributeMap
 
     private void invokeWrite0(Object msg, ChannelPromise promise) {
         try {
-            ((ChannelOutboundHandler) handler()).write(this, msg, promise);
+            ((ChannelOutboundHandler) handler()).write(this, msg, promise); // 获取当前handler，调用其write方法
         } catch (Throwable t) {
             notifyOutboundHandlerException(t, promise);
         }
@@ -773,7 +773,7 @@ abstract class AbstractChannelHandlerContext extends DefaultAttributeMap
 
     private void invokeFlush0() {
         try {
-            ((ChannelOutboundHandler) handler()).flush(this);
+            ((ChannelOutboundHandler) handler()).flush(this); // 获取当前handler，调用其flush方法
         } catch (Throwable t) {
             notifyHandlerException(t);
         }
@@ -781,7 +781,7 @@ abstract class AbstractChannelHandlerContext extends DefaultAttributeMap
 
     @Override
     public ChannelFuture writeAndFlush(Object msg, ChannelPromise promise) {
-        if (msg == null) {
+        if (msg == null) { // 不允许写入null
             throw new NullPointerException("msg");
         }
 
@@ -809,8 +809,8 @@ abstract class AbstractChannelHandlerContext extends DefaultAttributeMap
         AbstractChannelHandlerContext next = findContextOutbound();
         final Object m = pipeline.touch(msg, next);
         EventExecutor executor = next.executor();
-        if (executor.inEventLoop()) {
-            if (flush) {
+        if (executor.inEventLoop()) { // 同步或者异步的处理写事件
+            if (flush) { // 根据flush属性的设置与否，决定是调用AbstractChannelHandlerContext的invokeWriteAndFlush还是invokeWrite方法
                 next.invokeWriteAndFlush(m, promise);
             } else {
                 next.invokeWrite(m, promise);
@@ -940,6 +940,7 @@ abstract class AbstractChannelHandlerContext extends DefaultAttributeMap
     }
 
     private AbstractChannelHandlerContext findContextOutbound() {
+    	// 逆序遍历pipeline，找到与当前AbstractChannelHandlerContext最接近的类型为outBound的AbstractChannelHandlerContext，在当前场景中，就是Pipeline的HeadContext了
         AbstractChannelHandlerContext ctx = this;
         do {
             ctx = ctx.prev;
