@@ -1322,7 +1322,7 @@ public class DefaultChannelPipeline implements ChannelPipeline {
 
         @Override
         public void flush(ChannelHandlerContext ctx) throws Exception {
-            unsafe.flush();
+            unsafe.flush(); // 与write方法一样，其实现位于AbstractChannel.AbstractUnsafe
         }
 
         @Override
