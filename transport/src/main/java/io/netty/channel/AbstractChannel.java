@@ -897,8 +897,8 @@ public abstract class AbstractChannel extends DefaultAttributeMap implements Cha
                 return;
             }
 
-            outboundBuffer.addFlush();
-            flush0();
+            outboundBuffer.addFlush(); // 向当前channel的写缓冲区传入一个flush信号
+            flush0(); // 调用nio方法，将缓冲区的数据刷入网卡
         }
 
         @SuppressWarnings("deprecation")
@@ -931,7 +931,7 @@ public abstract class AbstractChannel extends DefaultAttributeMap implements Cha
             }
 
             try {
-                doWrite(outboundBuffer);
+                doWrite(outboundBuffer); // 真正的写入数据，其实现位于NioSocketChannel.NioSocketChannelUnsafe中
             } catch (Throwable t) {
                 if (t instanceof IOException && config().isAutoClose()) {
                     /**
