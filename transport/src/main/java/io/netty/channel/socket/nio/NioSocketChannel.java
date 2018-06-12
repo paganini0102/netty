@@ -358,7 +358,7 @@ public class NioSocketChannel extends AbstractNioByteChannel implements io.netty
     @Override
     protected void doWrite(ChannelOutboundBuffer in) throws Exception {
         for (;;) {
-            int size = in.size();
+            int size = in.size(); // 获取缓冲区中可以flush的数据大小
             if (size == 0) {
                 // All written so clear OP_WRITE
                 clearOpWrite();
@@ -372,20 +372,20 @@ public class NioSocketChannel extends AbstractNioByteChannel implements io.netty
             ByteBuffer[] nioBuffers = in.nioBuffers();
             int nioBufferCnt = in.nioBufferCount();
             long expectedWrittenBytes = in.nioBufferSize();
-            SocketChannel ch = javaChannel();
+            SocketChannel ch = javaChannel(); // 获取Java nio的原生channel
 
             // Always us nioBuffers() to workaround data-corruption.
             // See https://github.com/netty/netty/issues/2761
             switch (nioBufferCnt) {
                 case 0:
                     // We have something else beside ByteBuffers to write so fallback to normal writes.
-                    super.doWrite(in);
+                    super.doWrite(in); // 这里会调用AbstractNioByteChannel.NioByteUnsafe#doWrite()方法
                     return;
-                case 1:
+                case 1: // 只有一块数据需要写入
                     // Only one ByteBuf so use non-gathering write
-                    ByteBuffer nioBuffer = nioBuffers[0];
-                    for (int i = config().getWriteSpinCount() - 1; i >= 0; i --) {
-                        final int localWrittenBytes = ch.write(nioBuffer);
+                    ByteBuffer nioBuffer = nioBuffers[0]; // 获取待写入的ByteBuffer
+                    for (int i = config().getWriteSpinCount() - 1; i >= 0; i --) { // 自旋重试写入数据，默认最多尝试16次
+                        final int localWrittenBytes = ch.write(nioBuffer); // 调用Java NIO提供的原生write方法写入数据
                         if (localWrittenBytes == 0) {
                             setOpWrite = true;
                             break;
@@ -398,9 +398,9 @@ public class NioSocketChannel extends AbstractNioByteChannel implements io.netty
                         }
                     }
                     break;
-                default:
-                    for (int i = config().getWriteSpinCount() - 1; i >= 0; i --) {
-                        final long localWrittenBytes = ch.write(nioBuffers, 0, nioBufferCnt);
+                default: // 有多块数据需要写入
+                    for (int i = config().getWriteSpinCount() - 1; i >= 0; i --) { // 自旋重试写入数据，默认最多尝试16次
+                        final long localWrittenBytes = ch.write(nioBuffers, 0, nioBufferCnt); // 调用Java NIO提供的原生write方法写入数据
                         if (localWrittenBytes == 0) {
                             setOpWrite = true;
                             break;
@@ -416,9 +416,9 @@ public class NioSocketChannel extends AbstractNioByteChannel implements io.netty
             }
 
             // Release the fully written buffers, and update the indexes of the partially written buffer.
-            in.removeBytes(writtenBytes);
+            in.removeBytes(writtenBytes); // 移除缓冲区中已被写入的数据
 
-            if (!done) {
+            if (!done) { // 本次写入没有把缓冲区中的数据全部写完
                 // Did not write all buffers completely.
                 incompleteWrite(setOpWrite);
                 break;

@@ -276,7 +276,7 @@ public abstract class AbstractNioByteChannel extends AbstractNioChannel {
             setOpWrite();
         } else {
             // Schedule flush again later so other tasks can be picked up in the meantime
-            Runnable flushTask = this.flushTask;
+            Runnable flushTask = this.flushTask; // 先把机会让给EventLoop中的其他的Channel，当前Channel的写入任务下次会接着运行
             if (flushTask == null) {
                 flushTask = this.flushTask = new Runnable() {
                     @Override
