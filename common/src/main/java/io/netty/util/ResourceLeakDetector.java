@@ -54,21 +54,25 @@ public class ResourceLeakDetector<T> {
     public enum Level {
         /**
          * Disables resource leak detection.
+         * 禁用泄漏检测（只有在详尽的测试之后才应设置为这个值）
          */
         DISABLED,
         /**
          * Enables simplistic sampling resource leak detection which reports there is a leak or not,
          * at the cost of small overhead (default).
+         * 使用1%的默认采样率检测并报告任何发现的泄漏（默认级别，适合绝大部分的情况）
          */
         SIMPLE,
         /**
          * Enables advanced sampling resource leak detection which reports where the leaked object was accessed
          * recently at the cost of high overhead.
+         * 使用默认的采样率，报告所发现的任何的泄漏以及对应的消息被访问的位置
          */
         ADVANCED,
         /**
          * Enables paranoid resource leak detection which reports where the leaked object was accessed recently,
          * at the cost of the highest possible overhead (for testing purposes only).
+         * 类似与{@link Level.ADVANCED}，但是其将会对每次（对消息的）访问都进行采样（这对性能会有很大影响，应该只在调试阶段使用）
          */
         PARANOID;
 
