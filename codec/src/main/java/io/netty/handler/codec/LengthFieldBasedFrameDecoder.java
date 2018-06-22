@@ -352,10 +352,18 @@ public class LengthFieldBasedFrameDecoder extends ByteToMessageDecoder {
         }
     }
 
+    /**
+     * 判断discardingTooLongFrame标识，看是否需要丢弃当前可读的字节缓冲区，如果为真，则执行求其操作
+     * @param in
+     */
     private void discardingTooLongFrame(ByteBuf in) {
+    	// 获取需要丢弃的长度
         long bytesToDiscard = this.bytesToDiscard;
+        // 丢弃的长度不能超过当前缓冲区可读的字节数
         int localBytesToDiscard = (int) Math.min(bytesToDiscard, in.readableBytes());
+        // 跳过需要忽略的字节长度
         in.skipBytes(localBytesToDiscard);
+        // bytesToDiscard减去已经忽略的字节长度
         bytesToDiscard -= localBytesToDiscard;
         this.bytesToDiscard = bytesToDiscard;
 
@@ -415,6 +423,7 @@ public class LengthFieldBasedFrameDecoder extends ByteToMessageDecoder {
             discardingTooLongFrame(in);
         }
 
+        // 数据报内数据不够，返回null，由IO线程继续读取数据
         if (in.readableBytes() < lengthFieldEndOffset) {
             return null;
         }
