@@ -326,6 +326,10 @@ public final class NioEventLoop extends SingleThreadEventLoop {
      * around the infamous epoll 100% CPU bug.
      */
     public void rebuildSelector() {
+    	/**
+    	 * 判断是否又其他线程发起的rebuildSelector，如果由其他线程发起，为了避免多线程并发操作Selector和资源，需要将rebuildSelector封装
+    	 * 成Task，放到NioEventLoop的消息队列中，由NoiEventLoop线程负责调用，这样就避免了多线程并发操作导致的线程俺去问题
+    	 */
         if (!inEventLoop()) {
             execute(new Runnable() {
                 @Override
