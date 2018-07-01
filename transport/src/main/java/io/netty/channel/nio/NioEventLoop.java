@@ -176,6 +176,7 @@ public final class NioEventLoop extends SingleThreadEventLoop {
         }
 
         if (DISABLE_KEYSET_OPTIMIZATION) {
+        	// 如果没有开启selectedKeys优化开关，通过provider.openSelector()创建并打开多路复用器之后就立即返回
             return new SelectorTuple(unwrappedSelector);
         }
 
