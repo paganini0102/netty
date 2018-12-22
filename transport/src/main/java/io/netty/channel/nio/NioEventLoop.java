@@ -678,6 +678,9 @@ public final class NioEventLoop extends SingleThreadEventLoop {
         }
     }
 
+    /**
+     * 把注册在selector上的所有Channel都关闭
+     */
     private void closeAll() {
         selectAgain();
         Set<SelectionKey> keys = selector.keys();
@@ -693,7 +696,7 @@ public final class NioEventLoop extends SingleThreadEventLoop {
                 invokeChannelUnregistered(task, k, null);
             }
         }
-
+        // 循环调用Channel Unsafe的close方法
         for (AbstractNioChannel ch: channels) {
             ch.unsafe().close(ch.unsafe().voidPromise());
         }

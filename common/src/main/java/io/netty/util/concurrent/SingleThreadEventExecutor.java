@@ -510,6 +510,10 @@ public abstract class SingleThreadEventExecutor extends AbstractScheduledEventEx
         }
     }
 
+    /**
+     * 执行注册到NioEventLoop中的ShutdownHook
+     * @return
+     */
     private boolean runShutdownHooks() {
         boolean ran = false;
         // Note shutdown hooks can add / remove shutdown hooks.
@@ -734,22 +738,28 @@ public abstract class SingleThreadEventExecutor extends AbstractScheduledEventEx
 
     @Override
     public void execute(Runnable task) {
+        // 方法为空抛出异常
         if (task == null) {
             throw new NullPointerException("task");
         }
-
+        // 判断当前线程是否等于SingleThreadEventExecutor的thread（这个thread就是后期负载执行run方法的线程）
         boolean inEventLoop = inEventLoop();
         if (inEventLoop) {
+            // 添加任务
             addTask(task);
         } else {
+            // 启动线程
             startThread();
             addTask(task);
+            // 如果已经关闭了则删除任务
             if (isShutdown() && removeTask(task)) {
+                // 抛出reject异常
                 reject();
             }
         }
-
+        // addTaskWakesUp只有在调用了addTask才会为true，wakesUpForTask是检测这个task是否需要唤醒
         if (!addTaskWakesUp && wakesUpForTask(task)) {
+            // 只有在非io线程且wakenUp为false的情况下才会唤醒io线程（想想看io线程怎么能自己唤醒自己）
             wakeup(inEventLoop);
         }
     }
@@ -835,8 +845,11 @@ public abstract class SingleThreadEventExecutor extends AbstractScheduledEventEx
     private static final long SCHEDULE_PURGE_INTERVAL = TimeUnit.SECONDS.toNanos(1);
 
     private void startThread() {
+        // 如果还未启动
         if (state == ST_NOT_STARTED) {
+            // 设置启动标识
             if (STATE_UPDATER.compareAndSet(this, ST_NOT_STARTED, ST_STARTED)) {
+                // 开始真正启动
                 doStartThread();
             }
         }

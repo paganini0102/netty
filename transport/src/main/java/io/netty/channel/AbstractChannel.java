@@ -706,7 +706,7 @@ public abstract class AbstractChannel extends DefaultAttributeMap implements Cha
             }
 
             closeInitiated = true;
-
+            // 将发送队列清空，不再允许发送新的消息
             final boolean wasActive = isActive();
             final ChannelOutboundBuffer outboundBuffer = this.outboundBuffer;
             this.outboundBuffer = null; // Disallow adding any messages and flushes to outboundBuffer.
@@ -745,6 +745,7 @@ public abstract class AbstractChannel extends DefaultAttributeMap implements Cha
                         outboundBuffer.close(closeCause);
                     }
                 }
+                // 判断当前链路是否有消息正在发送，如果有则将SelectionKey的去注册操作封装成Task放到eventLoop中稍后再执行
                 if (inFlush0) {
                     invokeLater(new Runnable() {
                         @Override
