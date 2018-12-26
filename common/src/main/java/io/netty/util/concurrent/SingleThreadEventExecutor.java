@@ -742,7 +742,7 @@ public abstract class SingleThreadEventExecutor extends AbstractScheduledEventEx
         if (task == null) {
             throw new NullPointerException("task");
         }
-        // 判断当前线程是否等于SingleThreadEventExecutor的thread（这个thread就是后期负载执行run方法的线程）
+        // 判断当前线程是否等于SingleThreadEventExecutor的thread（这个thread就是后期负责执行run方法的线程）
         boolean inEventLoop = inEventLoop();
         if (inEventLoop) {
             // 添加任务
