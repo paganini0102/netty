@@ -360,6 +360,7 @@ public final class NioEventLoop extends SingleThreadEventLoop {
 
         // Register all channels to the new Selector.
         int nChannels = 0;
+        // 将原Selector上注册的SocketChannel从旧的Selector上去注册，重新注册到新的Selector上，并将老的Selector关闭
         for (SelectionKey key: oldSelector.keys()) {
             Object a = key.attachment();
             try {
@@ -498,6 +499,7 @@ public final class NioEventLoop extends SingleThreadEventLoop {
     }
 
     private void processSelectedKeys() {
+        // 由于默认未开启selectedKeys优化功能，所以会进入processSelectedKeysPlain分支执行
         if (selectedKeys != null) {
             processSelectedKeysOptimized();
         } else {
@@ -545,10 +547,10 @@ public final class NioEventLoop extends SingleThreadEventLoop {
             final SelectionKey k = i.next();
             final Object a = k.attachment();
             i.remove();
-
+            // 如果是AbstractNioChannel类型，说明它是NioServerSocketChannel或者NioSocketChannel，需要进行I/O读写相关的操作
             if (a instanceof AbstractNioChannel) {
                 processSelectedKey(k, (AbstractNioChannel) a);
-            } else {
+            } else { // 如果它是NioTask，则对其进行类型转换，调用processSelectedKey进行处理。由于Netty自身没有实现NioTask接口，所以通常情况下系统不会执行该分支
                 @SuppressWarnings("unchecked")
                 NioTask<SelectableChannel> task = (NioTask<SelectableChannel>) a;
                 processSelectedKey(k, task);
