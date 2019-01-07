@@ -524,7 +524,7 @@ public abstract class ByteToMessageDecoder extends ChannelInboundHandlerAdapter 
      */
     static ByteBuf expandCumulation(ByteBufAllocator alloc, ByteBuf cumulation, int readable) {
         ByteBuf oldCumulation = cumulation;
-        cumulation = alloc.buffer(oldCumulation.readableBytes() + readable);
+        cumulation = alloc.buffer(oldCumulation.readableBytes() + readable); // 利用字节缓冲区分配器重新分配一个新的ByteBuf，将老的cumulation复制到新的ByteBuf中，释放cumulation
         cumulation.writeBytes(oldCumulation);
         oldCumulation.release();
         return cumulation;
