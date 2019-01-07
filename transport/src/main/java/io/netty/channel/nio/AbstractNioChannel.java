@@ -55,7 +55,9 @@ public abstract class AbstractNioChannel extends AbstractChannel {
             new ClosedChannelException(), AbstractNioChannel.class, "doClose()");
 
     private final SelectableChannel ch;
+    /** 代表JDK SelectionKey的OP_READ */
     protected final int readInterestOp;
+    /** 该Channel注册到EventLoop后返回的选择键 */
     volatile SelectionKey selectionKey;
     boolean readPending;
     private final Runnable clearReadPendingRunnable = new Runnable() {

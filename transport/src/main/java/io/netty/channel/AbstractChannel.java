@@ -48,22 +48,28 @@ public abstract class AbstractChannel extends DefaultAttributeMap implements Cha
             new ClosedChannelException(), AbstractUnsafe.class, "flush0()");
     private static final ClosedChannelException ENSURE_OPEN_CLOSED_CHANNEL_EXCEPTION = ThrowableUtil.unknownStackTrace(
             new ClosedChannelException(), AbstractUnsafe.class, "ensureOpen(...)");
+    /** 链路已经关闭异常 */
     private static final ClosedChannelException CLOSE_CLOSED_CHANNEL_EXCEPTION = ThrowableUtil.unknownStackTrace(
             new ClosedChannelException(), AbstractUnsafe.class, "close(...)");
     private static final ClosedChannelException WRITE_CLOSED_CHANNEL_EXCEPTION = ThrowableUtil.unknownStackTrace(
             new ClosedChannelException(), AbstractUnsafe.class, "write(...)");
+    /** 物理链路尚未建立异常 */
     private static final NotYetConnectedException FLUSH0_NOT_YET_CONNECTED_EXCEPTION = ThrowableUtil.unknownStackTrace(
             new NotYetConnectedException(), AbstractUnsafe.class, "flush0()");
-
+    /** 父类Channel */
     private final Channel parent;
+    /** 采用默认方式生成的全局唯一ID */
     private final ChannelId id;
+    /** Unsafe实例 */
     private final Unsafe unsafe;
+    /** 当前Channel对应的DefaultChannelPipeline */
     private final DefaultChannelPipeline pipeline;
     private final VoidChannelPromise unsafeVoidPromise = new VoidChannelPromise(this, false);
     private final CloseFuture closeFuture = new CloseFuture(this);
 
     private volatile SocketAddress localAddress;
     private volatile SocketAddress remoteAddress;
+    /** 当前Channel注册的EventLoop */
     private volatile EventLoop eventLoop;
     private volatile boolean registered;
     private boolean closeInitiated;
