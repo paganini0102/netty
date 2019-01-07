@@ -260,10 +260,10 @@ public abstract class ByteToMessageDecoder extends ChannelInboundHandlerAdapter 
             CodecOutputList out = CodecOutputList.newInstance();
             try {
                 ByteBuf data = (ByteBuf) msg;
-                first = cumulation == null;
-                if (first) {
+                first = cumulation == null; // 通过判断是否为空解码器是否缓存了没有解码完成的半包消息
+                if (first) { // 如果为空，说明是首次解码或者最近一次已经处理完了半包消息，没有缓存的半包消息需要处理，直接将需要解码的ByteBuf赋值给cumulation
                     cumulation = data;
-                } else {
+                } else { // 如果cumulation缓存有上次没有解码完成的ByteBuf，则进行赋值操作，将需要解码的ByteBuf复制到cumulation中
                     cumulation = cumulator.cumulate(ctx.alloc(), cumulation, data);
                 }
                 callDecode(ctx, cumulation, out);
@@ -515,6 +515,13 @@ public abstract class ByteToMessageDecoder extends ChannelInboundHandlerAdapter 
         }
     }
 
+    /**
+     * 对cumulation的可写缓冲区进行扩展
+     * @param alloc
+     * @param cumulation
+     * @param readable
+     * @return
+     */
     static ByteBuf expandCumulation(ByteBufAllocator alloc, ByteBuf cumulation, int readable) {
         ByteBuf oldCumulation = cumulation;
         cumulation = alloc.buffer(oldCumulation.readableBytes() + readable);
