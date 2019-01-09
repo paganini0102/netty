@@ -299,6 +299,10 @@ public class NioSocketChannel extends AbstractNioByteChannel implements io.netty
 
     @Override
     protected boolean doConnect(SocketAddress remoteAddress, SocketAddress localAddress) throws Exception {
+        /**
+         * 如果指定了本地绑定端口，执行绑定操作放弃异步TCP连接，可能连接成功，
+         * 也可能暂时没有连接成功。如果没有立即连接成功，则监听连接操作
+         */
         if (localAddress != null) {
             doBind0(localAddress);
         }
