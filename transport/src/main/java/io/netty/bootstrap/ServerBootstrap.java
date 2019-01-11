@@ -173,7 +173,7 @@ public class ServerBootstrap extends AbstractBootstrap<ServerBootstrap, ServerCh
                 final ChannelPipeline pipeline = ch.pipeline();
                 ChannelHandler handler = config.handler();
                 if (handler != null) {
-                    pipeline.addLast(handler);
+                    pipeline.addLast(handler); // 将AbstractBootstrap的Handler添加到NioServerSocketChannel的ChannelPipeline中
                 }
                 // 将用于服务端注册的Handler ServerBootstrapAcceptor添加到ChannelPipeline中
                 ch.eventLoop().execute(new Runnable() {
