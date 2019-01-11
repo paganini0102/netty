@@ -175,7 +175,7 @@ public class ServerBootstrap extends AbstractBootstrap<ServerBootstrap, ServerCh
                 if (handler != null) {
                     pipeline.addLast(handler);
                 }
-
+                // 将用于服务端注册的Handler ServerBootstrapAcceptor添加到ChannelPipeline中
                 ch.eventLoop().execute(new Runnable() {
                     @Override
                     public void run() {
@@ -210,6 +210,9 @@ public class ServerBootstrap extends AbstractBootstrap<ServerBootstrap, ServerCh
         return new Map.Entry[size];
     }
 
+    /**
+     * 负责把接收到的客户端socketChannel注册到childGroup中，由childGroup中的eventLoop负责数据处理
+     */
     private static class ServerBootstrapAcceptor extends ChannelInboundHandlerAdapter {
 
         private final EventLoopGroup childGroup;
@@ -242,21 +245,22 @@ public class ServerBootstrap extends AbstractBootstrap<ServerBootstrap, ServerCh
         @Override
         @SuppressWarnings("unchecked")
         public void channelRead(ChannelHandlerContext ctx, Object msg) {
-            final Channel child = (Channel) msg;
+            final Channel child = (Channel) msg; // 接受的客户端的NioSocketChannel对象
 
-            child.pipeline().addLast(childHandler);
+            child.pipeline().addLast(childHandler); // 添加NioSocketChannel的处理器
 
-            setChannelOptions(child, childOptions, logger);
+            setChannelOptions(child, childOptions, logger); // 设置NioSocketChannel的配置项
 
-            for (Entry<AttributeKey<?>, Object> e: childAttrs) {
+            for (Entry<AttributeKey<?>, Object> e: childAttrs) { // 设置NioSocketChannel的属性
                 child.attr((AttributeKey<Object>) e.getKey()).set(e.getValue());
             }
 
             try {
+                // 注册客户端的NioSocketChannel到work EventLoop中
                 childGroup.register(child).addListener(new ChannelFutureListener() {
                     @Override
                     public void operationComplete(ChannelFuture future) throws Exception {
-                        if (!future.isSuccess()) {
+                        if (!future.isSuccess()) { // 注册失败，关闭客户端的NioSocketChannel
                             forceClose(child, future.cause());
                         }
                     }
