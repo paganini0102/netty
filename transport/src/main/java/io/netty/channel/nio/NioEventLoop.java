@@ -649,7 +649,7 @@ public final class NioEventLoop extends SingleThreadEventLoop {
             // Also check for readOps of 0 to workaround possible JDK bug which may otherwise lead
             // to a spin loop
             if ((readyOps & (SelectionKey.OP_READ | SelectionKey.OP_ACCEPT)) != 0 || readyOps == 0) { // 如果是读或者连接操作，则调用Unsafe的read方法
-                unsafe.ru(); // 如果是NoiServerSocketChannel，它的读操作就是接收客户端的TCP连接
+                unsafe.read(); // 如果是NoiServerSocketChannel，它的读操作就是接收客户端的TCP连接
             }
         } catch (CancelledKeyException ignored) {
             unsafe.close(unsafe.voidPromise());
