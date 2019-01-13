@@ -499,7 +499,7 @@ public final class NioEventLoop extends SingleThreadEventLoop {
     }
 
     private void processSelectedKeys() {
-        // 由于默认未开启selectedKeys优化功能，所以会进入processSelectedKeysPlain分支执行
+        // 当多路复用器检测到新的准备就绪的Channel是，默认执行processSelectedKeysOptimized
         if (selectedKeys != null) {
             processSelectedKeysOptimized();
         } else {
