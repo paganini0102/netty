@@ -256,7 +256,7 @@ public class ServerBootstrap extends AbstractBootstrap<ServerBootstrap, ServerCh
             }
 
             try {
-                // 注册客户端的NioSocketChannel到work EventLoop中
+                // 注册客户端的NioSocketChannel到work的EventLoop中
                 childGroup.register(child).addListener(new ChannelFutureListener() {
                     @Override
                     public void operationComplete(ChannelFuture future) throws Exception {
