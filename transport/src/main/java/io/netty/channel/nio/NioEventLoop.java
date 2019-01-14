@@ -412,7 +412,7 @@ public final class NioEventLoop extends SingleThreadEventLoop {
                     case SelectStrategy.CONTINUE:
                         continue;
                     case SelectStrategy.SELECT:
-                        select(wakenUp.getAndSet(false));
+                        select(wakenUp.getAndSet(false)); // 表示是否应该唤醒正在阻塞的select操作
 
                         // 'wakenUp.compareAndSet(false, true)' is always evaluated
                         // before calling 'selector.wakeup()' to reduce the wake-up
