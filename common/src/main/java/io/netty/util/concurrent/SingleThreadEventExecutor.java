@@ -745,16 +745,12 @@ public abstract class SingleThreadEventExecutor extends AbstractScheduledEventEx
         // 判断当前线程是否等于SingleThreadEventExecutor的thread（这个thread就是后期负责执行run方法的线程）
         boolean inEventLoop = inEventLoop();
         if (inEventLoop) {
-            // 添加任务
-            addTask(task);
+            addTask(task); // 添加任务
         } else {
-            // 启动线程
-            startThread();
+            startThread(); // 启动线程
             addTask(task);
-            // 如果已经关闭了则删除任务
-            if (isShutdown() && removeTask(task)) {
-                // 抛出reject异常
-                reject();
+            if (isShutdown() && removeTask(task)) { // 如果已经关闭了则删除任务
+                reject(); // 抛出reject异常
             }
         }
         // addTaskWakesUp只有在调用了addTask才会为true，wakesUpForTask是检测这个task是否需要唤醒
