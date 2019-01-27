@@ -53,10 +53,13 @@ public abstract class AbstractByteBuf extends ByteBuf {
         }
     }
 
+    /** 用于检测对象是否泄漏 */
     static final ResourceLeakDetector<ByteBuf> leakDetector =
             ResourceLeakDetectorFactory.instance().newResourceLeakDetector(ByteBuf.class);
 
+    /** 读索引 */
     int readerIndex;
+    /** 写索引 */
     int writerIndex;
     private int markedReaderIndex;
     private int markedWriterIndex;
