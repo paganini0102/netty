@@ -63,6 +63,7 @@ public abstract class AbstractByteBuf extends ByteBuf {
     int writerIndex;
     private int markedReaderIndex;
     private int markedWriterIndex;
+    /** 最大容量 */
     private int maxCapacity;
 
     protected AbstractByteBuf(int maxCapacity) {

@@ -108,8 +108,11 @@ public class IdleStateHandler extends ChannelDuplexHandler {
     };
 
     private final boolean observeOutput;
+    /** 读空闲超时时间设定，如果channelRead()方法超过readerIdleTime时间未被调用则会触发超时事件调用userEventTrigger()方法 */
     private final long readerIdleTimeNanos;
+    /** 写空闲超时时间设定，如果write()方法超过writerIdleTime时间未被调用则会触发超时事件调用userEventTrigger()方法 */
     private final long writerIdleTimeNanos;
+    /** 所有类型的空闲超时时间设定，包括读空闲和写空闲 */
     private final long allIdleTimeNanos;
 
     private ScheduledFuture<?> readerIdleTimeout;
