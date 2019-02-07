@@ -308,6 +308,10 @@ public class IdleStateHandler extends ChannelDuplexHandler {
         }
     }
 
+    /**
+     * 根据配置的readerIdleTime，writeIdleTIme等超时事件参数往任务队列taskQueue中添加定时任务task
+     * @param ctx
+     */
     private void initialize(ChannelHandlerContext ctx) {
         // Avoid the case where destroy() is called before scheduling timeouts.
         // See: https://github.com/netty/netty/issues/143
